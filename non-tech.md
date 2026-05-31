@@ -122,6 +122,59 @@ LIMIT         -- 7. limit rows
 > **Memory tip:** **S**ome **F**riends **W**ent **G**rocery **H**opping **O**n **L**adders
 > → SELECT, FROM, WHERE, GROUP BY, HAVING, ORDER BY, LIMIT
 
+## 4. Filtering Unique Values with DISTINCT
+
+Use `DISTINCT` to remove duplicate values from results.
+
+```sql
+SELECT DISTINCT column_name FROM table_name;
+```
+
+### Examples
+
+```sql
+-- Single column
+SELECT DISTINCT department FROM employees;
+
+-- Multiple columns (combination must be unique)
+SELECT DISTINCT department, job_title FROM employees;
+
+-- With WHERE clause
+SELECT DISTINCT department FROM employees
+WHERE status = 'active'
+ORDER BY department ASC;
+```
+
+### Other Ways to Get Unique Values
+
+```sql
+-- GROUP BY with aggregation
+SELECT department, COUNT(*) as total
+FROM employees
+GROUP BY department;
+
+-- HAVING - only truly unique values (appear exactly once)
+SELECT email FROM users
+GROUP BY email
+HAVING COUNT(*) = 1;
+
+-- ROW_NUMBER - keep one row per duplicate group
+SELECT * FROM (
+    SELECT *,
+    ROW_NUMBER() OVER (PARTITION BY email ORDER BY id) as rn
+    FROM users
+) t
+WHERE rn = 1;
+```
+
+### DISTINCT vs HAVING COUNT = 1
+
+|                     | `DISTINCT`               | `HAVING COUNT(*) = 1`    |
+| ------------------- | ------------------------ | ------------------------ |
+| Shows duplicates    | ❌ Removed               | ❌ Excluded              |
+| Shows unique values | ✅ Yes                   | ✅ Yes                   |
+| Use case            | Remove dupes from result | Only truly unique values |
+
 ---
 
 ## Putting It All Together
@@ -142,4 +195,4 @@ ORDER BY e.salary DESC;               -- sort descending (after WHERE)
 
 ---
 
-_Reference guide covering: NULL handling, ORDER BY DESC, and SQL clause order._
+_Reference guide covering: NULL handling, ORDER BY DESC, SQL clause order, and DISTINCT._
