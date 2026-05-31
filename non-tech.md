@@ -177,22 +177,77 @@ WHERE rn = 1;
 
 ---
 
+## 5. Checking String Length
+
+Use `LENGTH()` or `LEN()` depending on your database.
+
+```sql
+SELECT LENGTH(column_name) FROM table_name;
+```
+
+### By Database
+
+```sql
+-- MySQL, PostgreSQL, SQLite
+SELECT LENGTH(name) FROM users;
+
+-- SQL Server
+SELECT LEN(name) FROM users;
+```
+
+### Common Use Cases
+
+```sql
+-- Filter by string length
+SELECT * FROM users
+WHERE LENGTH(email) > 20;
+
+-- Find exact length
+SELECT * FROM users
+WHERE LENGTH(phone) = 10;
+
+-- Show length alongside column
+SELECT name, LENGTH(name) AS name_length
+FROM users
+ORDER BY name_length DESC;
+```
+
+### Handling NULLs
+
+```sql
+-- LENGTH of NULL returns NULL
+SELECT LENGTH(NULL);   -- returns NULL
+
+-- Use COALESCE to handle nulls
+SELECT LENGTH(COALESCE(phone, '')) AS phone_length
+FROM users;
+```
+
+### LENGTH vs LEN
+
+| Function           | Database                  | Trailing Spaces |
+| ------------------ | ------------------------- | --------------- |
+| `LENGTH(str)`      | MySQL, PostgreSQL, SQLite | Counted         |
+| `LEN(str)`         | SQL Server                | Ignored         |
+| `CHAR_LENGTH(str)` | MySQL                     | Counted         |
+
+---
+
 ## Putting It All Together
 
 A query combining all the concepts above:
 
 ```sql
-SELECT
+SELECT DISTINCT
   e.name,
-  COALESCE(e.phone, 'N/A') AS phone,
-  e.salary,
-  e.bonus
+  LENGTH(e.name) AS name_length,
+  COALESCE(e.phone, 'N/A') AS phone
 FROM employees e
-WHERE e.manager_id IS NOT NULL        -- NULL check
-  AND e.salary = e.bonus              -- column comparison
-ORDER BY e.salary DESC;               -- sort descending (after WHERE)
+WHERE e.manager_id IS NULL              -- NULL check
+  AND LENGTH(e.name) > 3               -- string length check
+ORDER BY name_length DESC;             -- sort descending (after WHERE)
 ```
 
 ---
 
-_Reference guide covering: NULL handling, ORDER BY DESC, SQL clause order, and DISTINCT._
+_Reference guide covering: NULL handling, ORDER BY DESC, SQL clause order, DISTINCT, and string length._
